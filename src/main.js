@@ -41,11 +41,44 @@ define(function(require, exports, module) {
     // Main controls -- translation
     Engine.on('keypress', function(keyPressed) {
       // W = 119, A = 97, S = 115, D = 100
-      console.log(keyPressed.charCode);
+      // console.log(keyPressed.charCode);
       if(keyPressed.charCode === 96) {
-        console.log("TILDA");
+        // console.log("TILDA");
         Engine.pipe(mainScroll);
-
+        mainScroll.on('update', function(data) {
+            console.log(data.delta)
+            if(data.delta[1] > 0) {
+                mainZ+=data.delta[1]/10
+                translationModifier.setTransform(function() {
+                        return Transform.translate(mainX, mainY, mainZ);
+                });
+            } else if(data.delta[1] < 0) {
+                mainZ+=data.delta[1]/10
+                translationModifier.setTransform(function() {
+                        return Transform.translate(mainX, mainY, mainZ);
+                });
+            } else {
+                translationModifier.setTransform(function() {
+                        return Transform.translate(mainX, mainY, mainZ);
+                });
+            }
+            if(data.delta[0] > 0) {
+                mainX+=data.delta[0]/50
+                translationModifier.setTransform(function() {
+                    return Transform.translate(mainX, mainY, mainZ);
+                });
+            } else if(data.delta[0] < 0) {
+                mainX+=data.delta[0]/50
+                translationModifier.setTransform(function() {
+                    return Transform.translate(mainX, mainY, mainZ);
+                });
+            } else {
+                translationModifier.setTransform(function() {
+                    return Transform.translate(mainX, mainY, mainZ);
+                });
+            }
+            Engine.unpipe(mainScroll);
+        });
       }
     });
 
