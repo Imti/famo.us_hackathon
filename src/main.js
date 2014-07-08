@@ -13,7 +13,7 @@ define(function(require, exports, module) {
     var mainContext = Engine.createContext();
     var mainX = 0;
     var mainY = 0;
-    var mainZ = 0;
+    var mainZ = 10;
     var mainScroll = new ScrollSync();
 
     mainContext.setPerspective(1000);
@@ -28,7 +28,7 @@ define(function(require, exports, module) {
 
     // Individuals
     var squareScroll = new ScrollSync();
-    var quaternion = new Quaternion(100, 0, 0, 0);
+    var quaternion = new Quaternion(100, 10, 10, 0);
     var smallQuaternion = new Quaternion(100, 0, 0, 0);
 
     var rotationModifier = new Modifier({
@@ -53,8 +53,36 @@ define(function(require, exports, module) {
         lineHeight: '300px',
         textAlign: 'center'
       },
-      transform: Transform.translate(0, 0, 150)
+      transform: Transform.translate(0, 0, 0)
     });
+
+    var squareModifier = new Modifier({
+      origin: [Math.random() * 2 - 1, Math.random() * 2 - 1],
+      align: [Math.random() * 2 - 1, Math.random() * 2 - 1],
+      transform: Transform.translate(0, 0, 0)
+    });
+
+    for(var i = 0; i < 1000; i++) {
+      squareModifier = new Modifier({
+        origin: [Math.random() * 100 - 50, Math.random() * 100 - 50],
+        align: [Math.random() * 100 - 50, Math.random() * 100 - 50],
+        transform: Transform.translate(Math.random() * 1000 - 1, Math.random() * 1000 - 1, Math.random() * 1000 - 100)
+      });
+
+      square = new Surface({
+        size: [1000, 1000],
+        classes: ['double-sided'],
+        content: 'Hello Famo.us',
+        properties: {
+          fontSize: '100px',
+          lineHeight: '1000px',
+          textAlign: 'center'
+        },
+      });
+      nodeOfSquares.add(squareModifier).add(square);
+    }
+
+    // nodeOfSquares.add(square);
     Engine.pipe(squareScroll);
 
     Engine.on('keyup', function() {
@@ -90,11 +118,16 @@ define(function(require, exports, module) {
       smallQuaternion.y = 0;
     });
 
-    nodeOfSquares.add(square);
 
 
     // Main controls -- translation
     Engine.on('keypress', function(keyPressed) {
+      // if(keyPressed.charCode = 119) {
+      //   mainY+=100;
+      //     translationModifier.setTransform(function() {
+      //       return Transform.translate(mainX, mainY, mainZ);
+      //   });
+      // }
       // console.log('keypress')
       // W = 119, A = 97, S = 115, D = 100
       // console.log(keyPressed.charCode);
