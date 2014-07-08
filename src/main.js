@@ -9,8 +9,7 @@ define(function(require, exports, module) {
     var Timer      = require('famous/utilities/Timer');
     var ScrollSync = require('famous/inputs/ScrollSync');
     var Quaternion = require('famous/math/Quaternion');
-    // var InfiniteScroll = require('famous-infinitescroll.js');
-    var TransitionableTransform = require("famous/transitions/TransitionableTransform");
+    var ImageSurface = require('famous/surfaces/ImageSurface');
 
     // Main Context
     var mainContext = Engine.createContext();
@@ -18,9 +17,8 @@ define(function(require, exports, module) {
     var mainY = 0;
     var mainZ = 10;
     var mainScroll = new ScrollSync();
-    var transitionableTransform = new TransitionableTransform();
 
-    mainContext.setPerspective(1000);
+    mainContext.setPerspective(500);
 
     var nodeOfSquares = new RenderNode();
     var surfaces = [];
@@ -32,6 +30,13 @@ define(function(require, exports, module) {
     });
 
     // Individuals
+    var cohortFriend = ['imtiazmaj', 'adam.price.1257', 'albreyb', 'agugel', 
+      'anthony.zavadil', 'Grimi94', 'austentalbot', 'dhfromkorea', 'forest.toney',
+      'forrest.thomas.14', 'gjtrowbridge', 'jake.adams.777', 'jake.harclerode',
+      'jyothers', 'jasen.lew', 'justin.cheung.543', 'kevin1liang', 'kia.fathi',
+      'craftjk', 'larry.may', 'mason.hargrove.9', 'neiljlobo', 'praur',
+      'roger.goldfinger', '584970081'];
+
     var squareScroll = new ScrollSync();
     var quaternion = new Quaternion(10, 0, 0, 0);
     var smallQuaternion = new Quaternion(10, 0, 0, 0);
@@ -49,67 +54,49 @@ define(function(require, exports, module) {
       quaternion = quaternion.multiply(smallQuaternion);
     });
 
-    var square = new Surface({
-      size: [3000, 3000],
-      classes: ['double-sided'],
-      content: 'Hello Famo.us',
-      properties: {
-        fontSize: '400px',
-        lineHeight: '3000px',
-        textAlign: 'center'
-      },
-      transform: Transform.translate(0, 0, 0)
-    });
-
-    var squareModifier = new Modifier({
-      origin: [Math.random() * 2 - 1, Math.random() * 2 - 1],
-      align: [Math.random() * 2 - 1, Math.random() * 2 - 1],
-      transform: Transform.translate(0, 0, 0)
-    });
-
-    for(var i = 0; i < 800; i++) {
+    for(var i = 0; i < 300; i++) {
+      var link = 'http://graph.facebook.com/' + cohortFriend[i%cohortFriend.length] + '/picture?type=large';
       squareModifier = new Modifier({
         origin: [0.5, 0.5],
         align: [0.5, 0.5],
-        transform: Transform.translate(Math.random() * 100000 - 50000, Math.random() * 100000 - 50000, Math.random() * 100000 - 50000),
+        transform: Transform.translate(Math.random() * 20000 - 10000, Math.random() * 20000 - 10000, Math.random() * 20000 - 10000),
       });
 
-      square = new Surface({
-        size: [100, 100],
+      square = new ImageSurface({
+        size: [300, 300],
         classes: ['double-sided'],
-        content: 'Hello Famo.us',
-        properties: {
-          fontSize: '10px',
-          lineHeight: '100px',
-          textAlign: 'center'
-        },
+        content: link
       });
 
       surfaces.push({square: squareModifier})
       nodeOfSquares.add(squareModifier).add(square);
     }
 
-    var randomPeriod = function() {
-      return Math.random() * 10000 - 1000;
-    }
+    // Moving individual squares
+    move()
+
     Timer.setInterval(function() {
+      move()
+    }, 5000)
+
+    function move() {
       for(var i = 0; i < surfaces.length; i++) {
-        var tempPeriod = randomPeriod();
-        console.log(tempPeriod);
-        surfaces[i].square.setTransform(Transform.translate(Math.random() * 10000 - 5000, Math.random() * 10000 - 5000, Math.random() * 10000 - 5000), {duration: tempPeriod})
+        tempPeriod = Math.random() * 25000;
+        //console.log(tempPeriod);
+        surfaces[i].square.setTransform(Transform.translate(Math.random() * 20000 - 10000, Math.random() * 20000 - 10000, Math.random() * 20000 - 10000), {duration: tempPeriod})
       }
-    }, 1000)
+    }
 
-
-    // nodeOfSquares.add(square);
     Engine.pipe(squareScroll);
 
+    // Switch controls when tilda lifted
     Engine.on('keyup', function() {
       console.log('keyup');
       Engine.unpipe(mainScroll);
       Engine.pipe(squareScroll);
     });
 
+    // Rotation
     squareScroll.on('update', function(data) {
       if(data.delta[0] < 0) {
         smallQuaternion.y += data.delta[0];
@@ -127,7 +114,6 @@ define(function(require, exports, module) {
         smallQuaternion.x += data.delta[1];
         if(smallQuaternion.x < 0) smallQuaternion.x = 50;
       }
-
       smallQuaternion.x = smallQuaternion.x/10;
       smallQuaternion.y = smallQuaternion.y/10;
     });
@@ -137,25 +123,12 @@ define(function(require, exports, module) {
       smallQuaternion.y = 0;
     });
 
-
-
     // Main controls -- translation
     Engine.on('keypress', function(keyPressed) {
-      // if(keyPressed.charCode = 119) {
-      //   mainY+=100;
-      //     translationModifier.setTransform(function() {
-      //       return Transform.translate(mainX, mainY, mainZ);
-      //   });
-      // }
-      // console.log('keypress')
-      // W = 119, A = 97, S = 115, D = 100
-      // console.log(keyPressed.charCode);
       if(keyPressed.charCode === 96) {
-        // console.log("TILDA");
         Engine.unpipe(squareScroll);
         Engine.pipe(mainScroll);
         mainScroll.on('update', function(data) {
-            // console.log(data.delta)
             if(data.delta[1] > 0) {
                 mainZ+=data.delta[1]/10
                 translationModifier.setTransform(function() {
