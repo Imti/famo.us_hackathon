@@ -6,8 +6,11 @@ define(function(require, exports, module) {
     var Transform  = require('famous/core/Transform');
     var RenderNode = require('famous/core/RenderNode');
     var KeyCodes   = require('famous/utilities/KeyCodes');
+    var Timer      = require('famous/utilities/Timer');
     var ScrollSync = require('famous/inputs/ScrollSync');
     var Quaternion = require('famous/math/Quaternion');
+    // var InfiniteScroll = require('famous-infinitescroll.js');
+    var TransitionableTransform = require("famous/transitions/TransitionableTransform");
 
     // Main Context
     var mainContext = Engine.createContext();
@@ -15,10 +18,12 @@ define(function(require, exports, module) {
     var mainY = 0;
     var mainZ = 10;
     var mainScroll = new ScrollSync();
+    var transitionableTransform = new TransitionableTransform();
 
     mainContext.setPerspective(1000);
 
     var nodeOfSquares = new RenderNode();
+    var surfaces = [];
 
     var translationModifier = new Modifier({
       origin: [0.5, 0.5],
@@ -28,12 +33,12 @@ define(function(require, exports, module) {
 
     // Individuals
     var squareScroll = new ScrollSync();
-    var quaternion = new Quaternion(100, 10, 10, 0);
-    var smallQuaternion = new Quaternion(100, 0, 0, 0);
+    var quaternion = new Quaternion(10, 0, 0, 0);
+    var smallQuaternion = new Quaternion(10, 0, 0, 0);
 
     var rotationModifier = new Modifier({
-      origin: [0.5, 0.5],
-      align: [0.5, 0.5]
+      origin: [0, 0],
+      align: [0, 0]
     });
 
     rotationModifier.setTransform(function() {
@@ -45,12 +50,12 @@ define(function(require, exports, module) {
     });
 
     var square = new Surface({
-      size: [300, 300],
+      size: [3000, 3000],
       classes: ['double-sided'],
       content: 'Hello Famo.us',
       properties: {
-        fontSize: '40px',
-        lineHeight: '300px',
+        fontSize: '400px',
+        lineHeight: '3000px',
         textAlign: 'center'
       },
       transform: Transform.translate(0, 0, 0)
@@ -62,25 +67,39 @@ define(function(require, exports, module) {
       transform: Transform.translate(0, 0, 0)
     });
 
-    for(var i = 0; i < 1000; i++) {
+    for(var i = 0; i < 800; i++) {
       squareModifier = new Modifier({
-        origin: [Math.random() * 100 - 50, Math.random() * 100 - 50],
-        align: [Math.random() * 100 - 50, Math.random() * 100 - 50],
-        transform: Transform.translate(Math.random() * 1000 - 1, Math.random() * 1000 - 1, Math.random() * 1000 - 100)
+        origin: [0.5, 0.5],
+        align: [0.5, 0.5],
+        transform: Transform.translate(Math.random() * 100000 - 50000, Math.random() * 100000 - 50000, Math.random() * 100000 - 50000),
       });
 
       square = new Surface({
-        size: [1000, 1000],
+        size: [100, 100],
         classes: ['double-sided'],
         content: 'Hello Famo.us',
         properties: {
-          fontSize: '100px',
-          lineHeight: '1000px',
+          fontSize: '10px',
+          lineHeight: '100px',
           textAlign: 'center'
         },
       });
+
+      surfaces.push({square: squareModifier})
       nodeOfSquares.add(squareModifier).add(square);
     }
+
+    var randomPeriod = function() {
+      return Math.random() * 10000 - 1000;
+    }
+    Timer.setInterval(function() {
+      for(var i = 0; i < surfaces.length; i++) {
+        var tempPeriod = randomPeriod();
+        console.log(tempPeriod);
+        surfaces[i].square.setTransform(Transform.translate(Math.random() * 10000 - 5000, Math.random() * 10000 - 5000, Math.random() * 10000 - 5000), {duration: tempPeriod})
+      }
+    }, 1000)
+
 
     // nodeOfSquares.add(square);
     Engine.pipe(squareScroll);
@@ -140,39 +159,36 @@ define(function(require, exports, module) {
             if(data.delta[1] > 0) {
                 mainZ+=data.delta[1]/10
                 translationModifier.setTransform(function() {
-                        return Transform.translate(mainX, mainY, mainZ);
+                  return Transform.translate(mainX, mainY, mainZ);
                 });
             } else if(data.delta[1] < 0) {
                 mainZ+=data.delta[1]/10
                 translationModifier.setTransform(function() {
-                        return Transform.translate(mainX, mainY, mainZ);
+                  return Transform.translate(mainX, mainY, mainZ);
                 });
             } else {
                 translationModifier.setTransform(function() {
-                        return Transform.translate(mainX, mainY, mainZ);
+                  return Transform.translate(mainX, mainY, mainZ);
                 });
             }
             if(data.delta[0] > 0) {
                 mainX+=data.delta[0]/50
                 translationModifier.setTransform(function() {
-                    return Transform.translate(mainX, mainY, mainZ);
+                  return Transform.translate(mainX, mainY, mainZ);
                 });
             } else if(data.delta[0] < 0) {
                 mainX+=data.delta[0]/50
                 translationModifier.setTransform(function() {
-                    return Transform.translate(mainX, mainY, mainZ);
+                  return Transform.translate(mainX, mainY, mainZ);
                 });
             } else {
                 translationModifier.setTransform(function() {
-                    return Transform.translate(mainX, mainY, mainZ);
+                  return Transform.translate(mainX, mainY, mainZ);
                 });
             }
         });
       }
     });
-
-
-
 
     mainContext.add(translationModifier).add(rotationModifier).add(nodeOfSquares);
 
