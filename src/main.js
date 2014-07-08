@@ -1,4 +1,5 @@
 define(function(require, exports, module) {
+
     // Requires
     var Engine     = require('famous/core/Engine');
     var Surface    = require('famous/core/Surface');
@@ -9,15 +10,15 @@ define(function(require, exports, module) {
     var Timer      = require('famous/utilities/Timer');
     var ScrollSync = require('famous/inputs/ScrollSync');
     var Quaternion = require('famous/math/Quaternion');
+    var MouseSync  = require('famous/inputs/MouseSync');
     var ImageSurface = require('famous/surfaces/ImageSurface');
 
     // Main Context
     var mainContext = Engine.createContext();
     var mainX = 0;
     var mainY = 0;
-    var mainZ = 10;
+    var mainZ = 0;
     var mainScroll = new ScrollSync();
-
     mainContext.setPerspective(500);
 
     var nodeOfSquares = new RenderNode();
@@ -38,6 +39,7 @@ define(function(require, exports, module) {
       'roger.goldfinger', '584970081'];
 
     var squareScroll = new ScrollSync();
+    var mouseSync = new MouseSync();
     var quaternion = new Quaternion(10, 0, 0, 0);
     var smallQuaternion = new Quaternion(10, 0, 0, 0);
 
@@ -54,23 +56,42 @@ define(function(require, exports, module) {
       quaternion = quaternion.multiply(smallQuaternion);
     });
 
-    for(var i = 0; i < 300; i++) {
+    // var squareModifier = new Modifier({});
+    // var square = new ImageSurface({});
+    var counter = 0;
+    // Add individual surfaces and add fb photo link
+    for(var i = 0; i < 30; i++) {
       var link = 'http://graph.facebook.com/' + cohortFriend[i%cohortFriend.length] + '/picture?type=large';
-      squareModifier = new Modifier({
+      var squareModifier = new Modifier({
         origin: [0.5, 0.5],
         align: [0.5, 0.5],
         transform: Transform.translate(Math.random() * 20000 - 10000, Math.random() * 20000 - 10000, Math.random() * 20000 - 10000),
       });
 
-      square = new ImageSurface({
+      var square = new ImageSurface({
         size: [300, 300],
         classes: ['double-sided'],
         content: link
       });
+      Engine.pipe(mouseSync);
 
+      square.on('click', function() {
+        console.log(mainZ);
+        console.log(mainContext);
+        console.log('click')
+        square.setContent(this._imageUrl);
+        Timer.setTimeout(function() {
+          squareModifier.setTransform(Transform.translate(Math.abs(mainX), Math.abs(mainY), Math.abs(mainZ)));
+        }, 120)
+        
+        // square.setContent(this._imageUrl);
+      });
+      
+      
       surfaces.push({square: squareModifier})
       nodeOfSquares.add(squareModifier).add(square);
     }
+    
 
     // Moving individual squares
     move()
@@ -91,7 +112,7 @@ define(function(require, exports, module) {
 
     // Switch controls when tilda lifted
     Engine.on('keyup', function() {
-      console.log('keyup');
+      // console.log('keyup');
       Engine.unpipe(mainScroll);
       Engine.pipe(squareScroll);
     });
