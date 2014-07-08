@@ -33,10 +33,10 @@ define(function(require, exports, module) {
     // Individuals
     var cohortFriend = ['imtiazmaj', 'adam.price.1257', 'albreyb', 'agugel', 
       'anthony.zavadil', 'Grimi94', 'austentalbot', 'dhfromkorea', 'forest.toney',
-      'forrest.thomas.14', 'gjtrowbridge', 'jake.adams.777', 'jake.harclerode',
+      'gjtrowbridge', 'jake.adams.777', 'jake.harclerode',
       'jyothers', 'jasen.lew', 'justin.cheung.543', 'kevin1liang', 'kia.fathi',
       'craftjk', 'larry.may', 'mason.hargrove.9', 'neiljlobo', 'praur',
-      'roger.goldfinger', '584970081'];
+      'roger.goldfinger', '584970081', 'forrest.thomas.14'];
 
     var squareScroll = new ScrollSync();
     var mouseSync = new MouseSync();
@@ -58,9 +58,8 @@ define(function(require, exports, module) {
 
     // var squareModifier = new Modifier({});
     // var square = new ImageSurface({});
-    var counter = 0;
     // Add individual surfaces and add fb photo link
-    for(var i = 0; i < 30; i++) {
+    for(var i = 0; i < 300; i++) {
       var link = 'http://graph.facebook.com/' + cohortFriend[i%cohortFriend.length] + '/picture?type=large';
       var squareModifier = new Modifier({
         origin: [0.5, 0.5],
@@ -75,30 +74,61 @@ define(function(require, exports, module) {
       });
       Engine.pipe(mouseSync);
 
-      square.on('click', function() {
-        console.log(mainZ);
-        console.log(mainContext);
-        console.log('click')
-        square.setContent(this._imageUrl);
-        Timer.setTimeout(function() {
-          squareModifier.setTransform(Transform.translate(Math.abs(mainX), Math.abs(mainY), Math.abs(mainZ)));
-        }, 120)
+      // comeToMe click event
+      // var toggleCuddle = false;
+
+      // Engine.on('click', function() {
+      //   if(!toggleCuddle) {
+      //     toggleCuddle = !toggleCuddle;
+      //     console.log('cuddle!')
+      //     for(var i = 0; i < surfaces.length; i++) {
+      //       surfaces[i].square.setTransform(Transform.translate(100, 100, i-1000), {duration: 100})
+      //     }
+      //   } 
+      //   if(toggleCuddle) {
+      //     toggleCuddle = !toggleCuddle;
+      //     console.log('boom!')
+      //     Timer.setInterval(function() {
+      //       move()
+      //     }, 1000);
+      //   }
+      // })
+
+
+      // var toggleCuddle = false;
+      // if(!toggleCuddle) {
+      //   Engine.on('click', function() {
+      //     for(var i = 0; i < surfaces.length; i++) {
+      //       surfaces[i].square.setTransform(Transform.translate(100, 100, i-1000), {duration: 100})        
+      //     }
+      //   }); 
+      //   toggleCuddle = !toggleCuddle;
+      // } 
+
+      //   toggleCuddle = !toggleCuddle;
+      //   Engine.on('click', function() {
+      //     console.log("boom!")
+      //     Timer.setInterval(function() {
+      //       if(toggleCuddle)
+      //         move()
+      //       }, 1000)
+      //   }); 
+      // }
+
         
         // square.setContent(this._imageUrl);
-      });
-      
       
       surfaces.push({square: squareModifier})
       nodeOfSquares.add(squareModifier).add(square);
     }
-    
 
     // Moving individual squares
     move()
 
     Timer.setInterval(function() {
-      move()
-    }, 5000)
+      if(!toggleCuddle)
+        move()
+    }, 1000)
 
     function move() {
       for(var i = 0; i < surfaces.length; i++) {
@@ -151,16 +181,19 @@ define(function(require, exports, module) {
         Engine.pipe(mainScroll);
         mainScroll.on('update', function(data) {
             if(data.delta[1] > 0) {
+              // console.log('Z1 > 0')
                 mainZ+=data.delta[1]/10
                 translationModifier.setTransform(function() {
                   return Transform.translate(mainX, mainY, mainZ);
                 });
             } else if(data.delta[1] < 0) {
+              // console.log('Z1 < 0')
                 mainZ+=data.delta[1]/10
                 translationModifier.setTransform(function() {
                   return Transform.translate(mainX, mainY, mainZ);
                 });
             } else {
+              // console.log('Z1 = 0')
                 translationModifier.setTransform(function() {
                   return Transform.translate(mainX, mainY, mainZ);
                 });
@@ -185,5 +218,4 @@ define(function(require, exports, module) {
     });
 
     mainContext.add(translationModifier).add(rotationModifier).add(nodeOfSquares);
-
 });
