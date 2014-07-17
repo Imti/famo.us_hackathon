@@ -56,8 +56,6 @@ define(function(require, exports, module) {
       quaternion = quaternion.multiply(smallQuaternion);
     });
 
-    // var squareModifier = new Modifier({});
-    // var square = new ImageSurface({});
     // Add individual surfaces and add fb photo link
     for(var i = 0; i < 300; i++) {
       var link = 'http://graph.facebook.com/' + cohortFriend[i%cohortFriend.length] + '/picture?type=large';
@@ -73,50 +71,6 @@ define(function(require, exports, module) {
         content: link
       });
       Engine.pipe(mouseSync);
-
-      // comeToMe click event
-      // var toggleCuddle = false;
-
-      // Engine.on('click', function() {
-      //   if(!toggleCuddle) {
-      //     toggleCuddle = !toggleCuddle;
-      //     console.log('cuddle!')
-      //     for(var i = 0; i < surfaces.length; i++) {
-      //       surfaces[i].square.setTransform(Transform.translate(100, 100, i-1000), {duration: 100})
-      //     }
-      //   } 
-      //   if(toggleCuddle) {
-      //     toggleCuddle = !toggleCuddle;
-      //     console.log('boom!')
-      //     Timer.setInterval(function() {
-      //       move()
-      //     }, 1000);
-      //   }
-      // })
-
-
-      // var toggleCuddle = false;
-      // if(!toggleCuddle) {
-      //   Engine.on('click', function() {
-      //     for(var i = 0; i < surfaces.length; i++) {
-      //       surfaces[i].square.setTransform(Transform.translate(100, 100, i-1000), {duration: 100})        
-      //     }
-      //   }); 
-      //   toggleCuddle = !toggleCuddle;
-      // } 
-
-      //   toggleCuddle = !toggleCuddle;
-      //   Engine.on('click', function() {
-      //     console.log("boom!")
-      //     Timer.setInterval(function() {
-      //       if(toggleCuddle)
-      //         move()
-      //       }, 1000)
-      //   }); 
-      // }
-
-        
-        // square.setContent(this._imageUrl);
       
       surfaces.push({square: squareModifier})
       nodeOfSquares.add(squareModifier).add(square);
@@ -126,14 +80,12 @@ define(function(require, exports, module) {
     move()
 
     Timer.setInterval(function() {
-      if(!toggleCuddle)
         move()
     }, 1000)
 
     function move() {
       for(var i = 0; i < surfaces.length; i++) {
         tempPeriod = Math.random() * 25000;
-        //console.log(tempPeriod);
         surfaces[i].square.setTransform(Transform.translate(Math.random() * 20000 - 10000, Math.random() * 20000 - 10000, Math.random() * 20000 - 10000), {duration: tempPeriod})
       }
     }
